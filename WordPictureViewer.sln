@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.2.32630.192
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WordPictureViewer", "WordPictureViewer.csproj", "{371ABB58-3DBF-4945-A624-78EFF7198D0C}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{371ABB58-3DBF-4945-A624-78EFF7198D0C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{371ABB58-3DBF-4945-A624-78EFF7198D0C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{371ABB58-3DBF-4945-A624-78EFF7198D0C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{371ABB58-3DBF-4945-A624-78EFF7198D0C}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {1F025639-83CD-4B62-9C45-D7BBD7BA502D}
+	EndGlobalSection
+EndGlobal
