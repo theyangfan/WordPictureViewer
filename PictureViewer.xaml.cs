@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,9 +10,14 @@ using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using F = System.Windows.Forms;
+using C = System.Windows.Controls;
+using System.Drawing;
+using System.Drawing.Imaging;
 
 namespace WordPictureViewer
 {
@@ -20,7 +26,7 @@ namespace WordPictureViewer
     /// </summary>
     public partial class PictureViewer : Window
     {
-        public PictureViewer()
+        public PictureViewer(Bitmap bitmap)
         {
             InitializeComponent();
             ResizeMode = ResizeMode.NoResize;
@@ -28,51 +34,74 @@ namespace WordPictureViewer
             WindowState = WindowState.Maximized;
             WindowStyle = WindowStyle.None;
             AllowsTransparency = true;
-            /*Window wnd = new Window();
-                    wnd.ResizeMode = ResizeMode.NoResize;
-                    wnd.WindowStartupLocation = WindowStartupLocation.CenterOwner;
-                    wnd.WindowState = WindowState.Maximized;
-                    wnd.WindowStyle = WindowStyle.None;
-                    wnd.AllowsTransparency = true;
-                    wnd.Background = new SolidColorBrush(Color.FromArgb(200, 0, 0, 0));
 
-                    C.StackPanel panel = new C.StackPanel();
-                    C.Button close = new C.Button() { Content = "关闭" };
-                    close.Click += (sen, e) => {
-                        wnd.Close();
-                    };
-                    close.HorizontalAlignment = HorizontalAlignment.Right;
-                    C.Image image = new C.Image();
-                    image.Stretch = Stretch.Uniform;
-                    image.HorizontalAlignment = HorizontalAlignment.Center;
-                    C.Label label = new C.Label();
-                    label.Foreground = new SolidColorBrush(Color.FromRgb(255, 255, 255));
-                    var bits = (byte[])Sel.Range.EnhMetaFileBits;
-                    using (MemoryStream ms = new MemoryStream(bits), ms2 = new MemoryStream())
-                    {
-                        D.Bitmap bitmap = new D.Bitmap(ms);
-                        bitmap.Save(ms2, D.Imaging.ImageFormat.Png);
-                        byte[] bytes = ms2.GetBuffer();
-                        BitmapImage bi = new BitmapImage();
-                        bi.BeginInit();
-                        bi.StreamSource = new MemoryStream(bytes);
-                        bi.EndInit();
-                        image.Source = bi;
-                    }
-                    panel.Children.Add(close);
-                    panel.Children.Add(label);
-                    panel.Children.Add(image);
+            double screenW = SystemParameters.PrimaryScreenWidth;
+            double screenH = SystemParameters.PrimaryScreenHeight - 35;
 
-                    double size = SystemParameters.PrimaryScreenWidth;
-                    wnd.MouseWheel += (sen, e) =>
-                    {
-                        size += e.Delta;
-                        image.Width = size;
-                        label.Content = size;
-                    };
+            double initW = bitmap.Width;
+            double initH = bitmap.Height;
+            double ratio = (double)bitmap.Width / bitmap.Height;
 
-                    wnd.Content = panel;
-                    wnd.Show();*/
+            if(initW > screenW)
+            {
+                initW= screenW;
+                initH = initW / ratio;
+            }
+            if(initH > screenH)
+            {
+                initH = screenH;
+                initW = initH * ratio;
+            }
+            initW *= 0.8;
+            initH *= 0.8;
+            UIImage.Width = initW;
+            UIImage.Height = initH;
+            using (MemoryStream ms = new MemoryStream())
+            {
+                bitmap.Save(ms, ImageFormat.Png);
+                byte[] bytes = ms.GetBuffer();
+                BitmapImage bi = new BitmapImage();
+                bi.BeginInit();
+                bi.StreamSource = new MemoryStream(bytes);
+                bi.EndInit();
+                UIImage.Source = bi;
+            }
+            double scale = 1;
+            this.MouseWheel += (sen, e) =>
+            {
+                DoubleAnimation aniScale = new DoubleAnimation() { Duration = TimeSpan.FromMilliseconds(200) };
+                
+                aniScale.From = scale;
+                
+                double delta = e.Delta / SystemParameters.PrimaryScreenWidth;
+                if (scale + delta < 1) return;
+                System.Windows.Point mouse = Mouse.GetPosition(UIImage);
+                scale += delta;
+                aniScale.To = scale;
+                double centerX = mouse.X;
+                double centerY = mouse.Y;
+                /*if (mouse.X < 0) centerX = 0;
+                else if (mouse.X > initW) centerX = initW;
+                else centerX = mouse.X;
+                if (mouse.Y < 0) centerY = 0;
+                else if (mouse.Y > initH) centerY = initH;
+                else centerY = mouse.Y;*/
+                DoubleAnimation aniX = new DoubleAnimation(centerX, centerX, TimeSpan.FromMilliseconds(0));
+                DoubleAnimation aniY = new DoubleAnimation(centerY, centerY, TimeSpan.FromMilliseconds(0));
+
+                UIScale.BeginAnimation(ScaleTransform.ScaleXProperty, aniScale);
+                UIScale.BeginAnimation(ScaleTransform.ScaleYProperty, aniScale);
+                UIScale.BeginAnimation(ScaleTransform.CenterXProperty, aniX);
+                UIScale.BeginAnimation(ScaleTransform.CenterYProperty, aniY);
+                
+                //UIImage.RenderTransform = new ScaleTransform(scale, scale, centerX, centerY);
+                UIScaleRatio.Content = $"{(int)(scale * 100)}%";
+            };
+        }
+
+        private void UICloseBtn_Click(object sender, RoutedEventArgs e)
+        {
+            Close();
         }
     }
 }

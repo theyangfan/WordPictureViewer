@@ -8,9 +8,7 @@ using Word = Microsoft.Office.Interop.Word;
 using Office = Microsoft.Office.Core;
 using Microsoft.Office.Tools.Word;
 using System.Windows;
-using F = System.Windows.Forms;
-using C = System.Windows.Controls;
-using D = System.Drawing;
+using System.Drawing;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
@@ -30,8 +28,14 @@ namespace WordPictureViewer
             {
                 try
                 {
-                    PictureViewer viewer = new PictureViewer();
-                    viewer.Show();
+                    var bits = (byte[])Sel.Range.EnhMetaFileBits;
+                    using (MemoryStream stream = new MemoryStream(bits))
+                    {
+                        Bitmap bitmap = new Bitmap(stream);
+                        PictureViewer viewer = new PictureViewer(bitmap);
+                        viewer.Show();
+                    }
+                    
                 }
                 catch (Exception e)
                 {

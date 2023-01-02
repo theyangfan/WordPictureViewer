@@ -5,8 +5,21 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:WordPictureViewer"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800" Background="#66000000">
+             d:DesignHeight="450" d:DesignWidth="800" Background="#BB000000">
     <Grid>
-            
+        <Grid.RowDefinitions>
+            <RowDefinition Height="35"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <StackPanel Panel.ZIndex="1" Orientation="Horizontal" HorizontalAlignment="Right">
+            <Label x:Name="UIScaleRatio" VerticalContentAlignment="Center" Foreground="White">100%</Label>
+            <Button x:Name="UICloseBtn" Width="25" Height="25" Margin="5" Click="UICloseBtn_Click">关闭</Button>
+        </StackPanel>
+        <Image Panel.ZIndex="0" x:Name="UIImage" Stretch="Uniform" Grid.Row="1" >
+            <Image.RenderTransform>
+                <ScaleTransform x:Name="UIScale"/>
+            </Image.RenderTransform>
+        </Image>
+        
     </Grid>
 </Window>
