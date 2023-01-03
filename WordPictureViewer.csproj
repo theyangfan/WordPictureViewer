@@ -211,7 +211,10 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Snipaste_2022-07-17_20-33-26.png" />
+    <Resource Include="close.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="close_red.png" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

@@ -26,6 +26,7 @@ namespace WordPictureViewer
     /// </summary>
     public partial class PictureViewer : Window
     {
+        private double _scale = 1;
         public PictureViewer(Bitmap bitmap)
         {
             InitializeComponent();
@@ -66,37 +67,32 @@ namespace WordPictureViewer
                 bi.EndInit();
                 UIImage.Source = bi;
             }
-            double scale = 1;
-            this.MouseWheel += (sen, e) =>
-            {
-                DoubleAnimation aniScale = new DoubleAnimation() { Duration = TimeSpan.FromMilliseconds(200) };
-                
-                aniScale.From = scale;
-                
-                double delta = e.Delta / SystemParameters.PrimaryScreenWidth;
-                if (scale + delta < 1) return;
-                System.Windows.Point mouse = Mouse.GetPosition(UIImage);
-                scale += delta;
-                aniScale.To = scale;
-                double centerX = mouse.X;
-                double centerY = mouse.Y;
-                /*if (mouse.X < 0) centerX = 0;
-                else if (mouse.X > initW) centerX = initW;
-                else centerX = mouse.X;
-                if (mouse.Y < 0) centerY = 0;
-                else if (mouse.Y > initH) centerY = initH;
-                else centerY = mouse.Y;*/
-                DoubleAnimation aniX = new DoubleAnimation(centerX, centerX, TimeSpan.FromMilliseconds(0));
-                DoubleAnimation aniY = new DoubleAnimation(centerY, centerY, TimeSpan.FromMilliseconds(0));
+            
+            MouseWheel += PictureViewer_MouseWheel;
+        }
 
-                UIScale.BeginAnimation(ScaleTransform.ScaleXProperty, aniScale);
-                UIScale.BeginAnimation(ScaleTransform.ScaleYProperty, aniScale);
-                UIScale.BeginAnimation(ScaleTransform.CenterXProperty, aniX);
-                UIScale.BeginAnimation(ScaleTransform.CenterYProperty, aniY);
-                
-                //UIImage.RenderTransform = new ScaleTransform(scale, scale, centerX, centerY);
-                UIScaleRatio.Content = $"{(int)(scale * 100)}%";
-            };
+        private void PictureViewer_MouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            double delta = e.Delta / SystemParameters.PrimaryScreenWidth;
+            if (_scale + delta < 1) return;
+            DoubleAnimation aniScale = new DoubleAnimation() { Duration = TimeSpan.FromMilliseconds(1000) };
+            aniScale.From = _scale;
+            _scale += delta;
+            aniScale.To = _scale;
+            System.Windows.Point mouse = Mouse.GetPosition(UIImage);
+            double centerX = mouse.X;
+            double centerY = mouse.Y;
+
+            DoubleAnimation aniX = new DoubleAnimation(centerX, centerX, TimeSpan.FromMilliseconds(0));
+            DoubleAnimation aniY = new DoubleAnimation(centerY, centerY, TimeSpan.FromMilliseconds(0));
+
+            UIScale.BeginAnimation(ScaleTransform.ScaleXProperty, aniScale);
+            UIScale.BeginAnimation(ScaleTransform.ScaleYProperty, aniScale);
+            UIScale.BeginAnimation(ScaleTransform.CenterXProperty, aniX);
+            UIScale.BeginAnimation(ScaleTransform.CenterYProperty, aniY);
+
+            //UIImage.RenderTransform = new ScaleTransform(scale, scale, centerX, centerY);
+            UIScaleRatio.Content = $"{(int)(_scale * 100)} %";
         }
 
         private void UICloseBtn_Click(object sender, RoutedEventArgs e)
