@@ -26,7 +26,8 @@ namespace WordPictureViewer
     /// </summary>
     public partial class PictureViewer : Window
     {
-        private double _scale = 1;
+        private int _scale = 100;
+        private int _scaleStep = 9;
         public PictureViewer(Bitmap bitmap)
         {
             InitializeComponent();
@@ -73,12 +74,21 @@ namespace WordPictureViewer
 
         private void PictureViewer_MouseWheel(object sender, MouseWheelEventArgs e)
         {
-            double delta = e.Delta / SystemParameters.PrimaryScreenWidth;
-            if (_scale + delta < 1) return;
-            DoubleAnimation aniScale = new DoubleAnimation() { Duration = TimeSpan.FromMilliseconds(1000) };
-            aniScale.From = _scale;
-            _scale += delta;
-            aniScale.To = _scale;
+            if(e.Delta > 0)
+            {
+                if(_scaleStep < 0)_scaleStep = -_scaleStep;
+                else _scaleStep++;
+            }
+            else
+            {
+                if (_scaleStep > 0) _scaleStep = -_scaleStep;
+                else if(_scale + _scaleStep >= 99) _scaleStep++;
+            }
+            
+            if (_scale + _scaleStep < 100) return;
+            DoubleAnimation aniScale = new DoubleAnimation() { Duration = TimeSpan.FromMilliseconds(250) };
+            _scale += _scaleStep;
+            aniScale.To = (double)_scale / 100;
             System.Windows.Point mouse = Mouse.GetPosition(UIImage);
             double centerX = mouse.X;
             double centerY = mouse.Y;
@@ -86,13 +96,14 @@ namespace WordPictureViewer
             DoubleAnimation aniX = new DoubleAnimation(centerX, centerX, TimeSpan.FromMilliseconds(0));
             DoubleAnimation aniY = new DoubleAnimation(centerY, centerY, TimeSpan.FromMilliseconds(0));
 
-            UIScale.BeginAnimation(ScaleTransform.ScaleXProperty, aniScale);
-            UIScale.BeginAnimation(ScaleTransform.ScaleYProperty, aniScale);
+            UIScale.BeginAnimation(ScaleTransform.ScaleXProperty, aniScale, HandoffBehavior.Compose);
+            UIScale.BeginAnimation(ScaleTransform.ScaleYProperty, aniScale, HandoffBehavior.Compose);
             UIScale.BeginAnimation(ScaleTransform.CenterXProperty, aniX);
             UIScale.BeginAnimation(ScaleTransform.CenterYProperty, aniY);
+            
 
             //UIImage.RenderTransform = new ScaleTransform(scale, scale, centerX, centerY);
-            UIScaleRatio.Content = $"{(int)(_scale * 100)} %";
+            UIScaleRatio.Content = $"{_scale} %";
         }
 
         private void UICloseBtn_Click(object sender, RoutedEventArgs e)
