@@ -8,13 +8,22 @@
              Title="图片预览" d:DesignHeight="450" d:DesignWidth="800" Background="#CC000000">
     <Window.Resources>
         <Style x:Key="ImageBtnStyle1" TargetType="{x:Type Button}">
+            <Setter Property="Background" Value="Transparent"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type Button}">
-                        <Image Name="icon" Width="20" Source="/WordPictureViewer;component/close.png" />
+                        <Border Name="border" Background="{TemplateBinding Background}" CornerRadius="20" BorderThickness="1">
+                            <Image Name="icon" Width="20" Stretch="Uniform" Source="/WordPictureViewer;component/close.png" />
+                        </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="icon" Property="Source" Value="/WordPictureViewer;component/close_red.png" />
+                                <Setter TargetName="border" Property="Background" Value="Red" />
+                                <Setter TargetName="border" Property="Effect">
+                                    <Setter.Value>
+                                        <DropShadowEffect Color="Red" BlurRadius="12" ShadowDepth="0"/>
+                                    </Setter.Value>
+                                </Setter>
+                                <Setter TargetName="icon" Property="Width" Value="22" />
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -37,7 +46,7 @@
             </Image.RenderTransform>
         </Image>
 
-        <Button Panel.ZIndex="1" Grid.Row="2" x:Name="UICloseBtn" Width="25" Height="25" Margin="5" Click="UICloseBtn_Click" Background="Transparent" BorderThickness="0" Style="{DynamicResource ImageBtnStyle1}">
+        <Button Panel.ZIndex="1" Grid.Row="2" x:Name="UICloseBtn" Width="40" Height="40" Click="UICloseBtn_Click" Style="{DynamicResource ImageBtnStyle1}">
         </Button>
     </Grid>
 </Window>

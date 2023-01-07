@@ -100,9 +100,6 @@ namespace WordPictureViewer
             UIScale.BeginAnimation(ScaleTransform.ScaleYProperty, aniScale, HandoffBehavior.Compose);
             UIScale.BeginAnimation(ScaleTransform.CenterXProperty, aniX);
             UIScale.BeginAnimation(ScaleTransform.CenterYProperty, aniY);
-            
-
-            //UIImage.RenderTransform = new ScaleTransform(scale, scale, centerX, centerY);
             UIScaleRatio.Content = $"{_scale} %";
         }
 

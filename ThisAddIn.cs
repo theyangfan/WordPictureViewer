@@ -23,6 +23,8 @@ namespace WordPictureViewer
 
         private void Application_WindowBeforeDoubleClick(Word.Selection Sel, ref bool Cancel)
         {
+            Ribbon ribbon = Globals.Ribbons.GetRibbon<Ribbon>();
+            if (!ribbon.IsEnable) return;
             if(Sel.Type == Word.WdSelectionType.wdSelectionShape
                 || Sel.Type == Word.WdSelectionType.wdSelectionInlineShape)
             {
@@ -35,15 +37,12 @@ namespace WordPictureViewer
                         PictureViewer viewer = new PictureViewer(bitmap);
                         viewer.Show();
                     }
-                    
                 }
                 catch (Exception e)
                 {
                     MessageBox.Show($"{e.Message}\n{e.StackTrace}");
                 }
-                
             }
-            
         }
 
         private void ThisAddIn_Shutdown(object sender, System.EventArgs e)
