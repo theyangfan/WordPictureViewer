@@ -11,6 +11,16 @@
             : base(Globals.Factory.GetRibbonFactory())
         {
             InitializeComponent();
+            if (System.Globalization.CultureInfo.CurrentCulture.NativeName.StartsWith("中文"))
+            {
+                tab1.Label = "图片预览";
+                UIEnable.Label = "启用";
+            }
+            else
+            {
+                tab1.Label = "PicViewer";
+                UIEnable.Label = "Enable";
+            }
         }
 
         /// <summary> 
@@ -47,6 +57,7 @@
             this.tab1.Groups.Add(this.group1);
             this.tab1.Label = "图片预览";
             this.tab1.Name = "tab1";
+            this.tab1.Tag = "";
             // 
             // group1
             // 
@@ -75,10 +86,9 @@
         }
 
         #endregion
-
-        internal Microsoft.Office.Tools.Ribbon.RibbonTab tab1;
         internal Microsoft.Office.Tools.Ribbon.RibbonGroup group1;
         internal Microsoft.Office.Tools.Ribbon.RibbonCheckBox UIEnable;
+        internal Microsoft.Office.Tools.Ribbon.RibbonTab tab1;
     }
 
     partial class ThisRibbonCollection

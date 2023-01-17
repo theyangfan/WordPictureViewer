@@ -16,7 +16,7 @@ namespace WordPictureViewer
 
         private void Ribbon_Load(object sender, RibbonUIEventArgs e)
         {
-
+            
         }
     }
 }

@@ -26,8 +26,12 @@ namespace WordPictureViewer
     /// </summary>
     public partial class PictureViewer : Window
     {
+        #region Private Members
         private int _scale = 100;
         private int _scaleStep = 9;
+        #endregion
+
+        #region Constructor
         public PictureViewer(Bitmap bitmap)
         {
             InitializeComponent();
@@ -37,13 +41,12 @@ namespace WordPictureViewer
             WindowStyle = WindowStyle.None;
             AllowsTransparency = true;
 
+            // Init image size
             double screenW = SystemParameters.PrimaryScreenWidth;
-            double screenH = SystemParameters.PrimaryScreenHeight - 35;
-
+            double screenH = SystemParameters.PrimaryScreenHeight;
             double initW = bitmap.Width;
             double initH = bitmap.Height;
             double ratio = (double)bitmap.Width / bitmap.Height;
-
             if(initW > screenW)
             {
                 initW= screenW;
@@ -58,6 +61,7 @@ namespace WordPictureViewer
             initH *= 0.8;
             UIImage.Width = initW;
             UIImage.Height = initH;
+            // Set image source
             using (MemoryStream ms = new MemoryStream())
             {
                 bitmap.Save(ms, ImageFormat.Png);
@@ -68,24 +72,26 @@ namespace WordPictureViewer
                 bi.EndInit();
                 UIImage.Source = bi;
             }
-            
+            // Mouse wheel event
             MouseWheel += PictureViewer_MouseWheel;
         }
+        #endregion
 
+        #region Private Methods
         private void PictureViewer_MouseWheel(object sender, MouseWheelEventArgs e)
         {
-            if(e.Delta > 0)
+            if(e.Delta > 0) // zoom in
             {
                 if(_scaleStep < 0)_scaleStep = -_scaleStep;
                 else _scaleStep++;
             }
-            else
+            else // zoom out
             {
                 if (_scaleStep > 0) _scaleStep = -_scaleStep;
                 else if(_scale + _scaleStep >= 99) _scaleStep++;
             }
-            
             if (_scale + _scaleStep < 100) return;
+            // smooth scale animation
             DoubleAnimation aniScale = new DoubleAnimation() { Duration = TimeSpan.FromMilliseconds(250) };
             _scale += _scaleStep;
             aniScale.To = (double)_scale / 100;
@@ -107,5 +113,6 @@ namespace WordPictureViewer
         {
             Close();
         }
+        #endregion
     }
 }

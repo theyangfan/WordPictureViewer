@@ -25,6 +25,7 @@ namespace WordPictureViewer
         {
             Ribbon ribbon = Globals.Ribbons.GetRibbon<Ribbon>();
             if (!ribbon.IsEnable) return;
+            // Filter shapes
             if(Sel.Type == Word.WdSelectionType.wdSelectionShape
                 || Sel.Type == Word.WdSelectionType.wdSelectionInlineShape)
             {
