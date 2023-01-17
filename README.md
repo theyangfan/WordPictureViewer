@@ -11,3 +11,5 @@
 ![example_01](https://github.com/theyangfan/WordPictureViewer/blob/main/example_01.png)
 
 ![example_02](https://github.com/theyangfan/WordPictureViewer/blob/main/example_02.png)
+
+![example_03](https://github.com/theyangfan/WordPictureViewer/blob/main/example_03.png)
