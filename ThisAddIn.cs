@@ -31,13 +31,9 @@ namespace WordPictureViewer
             {
                 try
                 {
-                    var bits = (byte[])Sel.Range.EnhMetaFileBits;
-                    using (MemoryStream stream = new MemoryStream(bits))
-                    {
-                        Bitmap bitmap = new Bitmap(stream);
-                        PictureViewer viewer = new PictureViewer(bitmap);
-                        viewer.Show();
-                    }
+                    PictureViewer viewer = new PictureViewer();
+                    viewer.Show();
+                    viewer.SetImageSource(Sel.Range);
                 }
                 catch (Exception e)
                 {

@@ -43,6 +43,7 @@
         <Image Panel.ZIndex="0" Grid.Row="1" x:Name="UIImage" Stretch="Uniform">
             <Image.RenderTransform>
                 <ScaleTransform x:Name="UIScale"/>
+                
             </Image.RenderTransform>
         </Image>
 

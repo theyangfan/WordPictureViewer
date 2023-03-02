@@ -18,6 +18,7 @@ using F = System.Windows.Forms;
 using C = System.Windows.Controls;
 using System.Drawing;
 using System.Drawing.Imaging;
+using Word = Microsoft.Office.Interop.Word;
 
 namespace WordPictureViewer
 {
@@ -32,7 +33,7 @@ namespace WordPictureViewer
         #endregion
 
         #region Constructor
-        public PictureViewer(Bitmap bitmap)
+        public PictureViewer()
         {
             InitializeComponent();
             ResizeMode = ResizeMode.NoResize;
@@ -40,42 +41,67 @@ namespace WordPictureViewer
             WindowState = WindowState.Maximized;
             WindowStyle = WindowStyle.None;
             AllowsTransparency = true;
-
-            // Init image size
-            double screenW = SystemParameters.PrimaryScreenWidth;
-            double screenH = SystemParameters.PrimaryScreenHeight;
-            double initW = bitmap.Width;
-            double initH = bitmap.Height;
-            double ratio = (double)bitmap.Width / bitmap.Height;
-            if(initW > screenW)
-            {
-                initW= screenW;
-                initH = initW / ratio;
-            }
-            if(initH > screenH)
-            {
-                initH = screenH;
-                initW = initH * ratio;
-            }
-            initW *= 0.8;
-            initH *= 0.8;
-            UIImage.Width = initW;
-            UIImage.Height = initH;
-            // Set image source
-            using (MemoryStream ms = new MemoryStream())
-            {
-                bitmap.Save(ms, ImageFormat.Png);
-                byte[] bytes = ms.GetBuffer();
-                BitmapImage bi = new BitmapImage();
-                bi.BeginInit();
-                bi.StreamSource = new MemoryStream(bytes);
-                bi.EndInit();
-                UIImage.Source = bi;
-            }
+            
             // Mouse wheel event
             MouseWheel += PictureViewer_MouseWheel;
         }
         #endregion
+
+        public void SetImageSource(Word.Range range)
+        {
+            var shape = range.InlineShapes[1];
+            var bits = (byte[])shape.Range.EnhMetaFileBits;
+            using (MemoryStream stream = new MemoryStream(bits))
+            {
+                Bitmap bitmap = new Bitmap(stream);
+            
+                // Init image size
+                
+                double initW = bitmap.Height * (shape.Width / shape.Height);
+                double initH = bitmap.Height;
+                Bitmap cropBmp = Crop(bitmap, (int)initW, (int)initH);
+                double ratio = (double)initW / initH;
+                double screenW = SystemParameters.PrimaryScreenWidth;
+                double screenH = SystemParameters.PrimaryScreenHeight;
+                if (initW > screenW)
+                {
+                    initW = screenW;
+                    initH = initW / ratio;
+                }
+                if (initH > screenH)
+                {
+                    initH = screenH;
+                    initW = initH * ratio;
+                }
+                initW *= 0.8;
+                initH *= 0.8;
+                UIImage.Width = initW;
+                UIImage.Height = initH;
+                
+                // Set image source
+                using (MemoryStream ms = new MemoryStream())
+                {
+                    cropBmp.Save(ms, ImageFormat.Bmp);
+                    byte[] bytes = ms.GetBuffer();
+                    BitmapImage bi = new BitmapImage();
+                    bi.BeginInit();
+                    bi.StreamSource = new MemoryStream(bytes);
+                    bi.EndInit();
+                    UIImage.Source = bi;
+                }
+                double centerX = initW / 2;
+                double centerY = initH / 2;
+                DoubleAnimation aniScale = new DoubleAnimation() { Duration = TimeSpan.FromMilliseconds(250) };
+                DoubleAnimation aniX = new DoubleAnimation(centerX, centerX, TimeSpan.FromMilliseconds(0));
+                DoubleAnimation aniY = new DoubleAnimation(centerY, centerY, TimeSpan.FromMilliseconds(0));
+                aniScale.From = 0;
+                aniScale.To = 1;
+                UIScale.BeginAnimation(ScaleTransform.ScaleXProperty, aniScale, HandoffBehavior.Compose);
+                UIScale.BeginAnimation(ScaleTransform.ScaleYProperty, aniScale, HandoffBehavior.Compose);
+                UIScale.BeginAnimation(ScaleTransform.CenterXProperty, aniX);
+                UIScale.BeginAnimation(ScaleTransform.CenterYProperty, aniY);
+            }
+        }
 
         #region Private Methods
         private void PictureViewer_MouseWheel(object sender, MouseWheelEventArgs e)
@@ -109,6 +135,17 @@ namespace WordPictureViewer
             UIScaleRatio.Content = $"{_scale} %";
         }
 
+        private Bitmap Crop(Bitmap srcBmp, int width, int height)
+        {
+            System.Drawing.Rectangle cropRect = new System.Drawing.Rectangle(0, 0, width, height);
+            Bitmap cropBmp = new Bitmap(width, height);
+            using(Graphics g = Graphics.FromImage(cropBmp))
+            {
+                g.DrawImage(srcBmp, new System.Drawing.Rectangle(0, 0, cropBmp.Width, cropBmp.Height),
+                    cropRect, GraphicsUnit.Pixel);
+            }
+            return cropBmp;
+        }
         private void UICloseBtn_Click(object sender, RoutedEventArgs e)
         {
             Close();
