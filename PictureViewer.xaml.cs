@@ -47,16 +47,16 @@ namespace WordPictureViewer
         }
         #endregion
 
-        public void SetImageSource(Word.Range range)
+        public void SetImageRange(Word.Range range)
         {
-            var shape = range.InlineShapes[1];
+            var shape = range.InlineShapes?[1];
+            if (shape == null) return;
             var bits = (byte[])shape.Range.EnhMetaFileBits;
             using (MemoryStream stream = new MemoryStream(bits))
             {
                 Bitmap bitmap = new Bitmap(stream);
             
                 // Init image size
-                
                 double initW = bitmap.Height * (shape.Width / shape.Height);
                 double initH = bitmap.Height;
                 Bitmap cropBmp = Crop(bitmap, (int)initW, (int)initH);
@@ -135,6 +135,13 @@ namespace WordPictureViewer
             UIScaleRatio.Content = $"{_scale} %";
         }
 
+        /// <summary>
+        /// Crop the bitmap to the specified size.
+        /// </summary>
+        /// <param name="srcBmp">The original bitmap.</param>
+        /// <param name="width">The specified width to crop.</param>
+        /// <param name="height">The specified height to crop.</param>
+        /// <returns>The new bitmap.</returns>
         private Bitmap Crop(Bitmap srcBmp, int width, int height)
         {
             System.Drawing.Rectangle cropRect = new System.Drawing.Rectangle(0, 0, width, height);
@@ -146,6 +153,7 @@ namespace WordPictureViewer
             }
             return cropBmp;
         }
+
         private void UICloseBtn_Click(object sender, RoutedEventArgs e)
         {
             Close();

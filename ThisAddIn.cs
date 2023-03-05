@@ -33,7 +33,7 @@ namespace WordPictureViewer
                 {
                     PictureViewer viewer = new PictureViewer();
                     viewer.Show();
-                    viewer.SetImageSource(Sel.Range);
+                    viewer.SetImageRange(Sel.Range);
                 }
                 catch (Exception e)
                 {
