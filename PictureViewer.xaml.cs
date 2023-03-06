@@ -47,16 +47,19 @@ namespace WordPictureViewer
         }
         #endregion
 
+        #region Public Method
         public void SetImageRange(Word.Range range)
         {
+            // get original shape
+            //var shape = range.ShapeRange[1];
             var shape = range.InlineShapes?[1];
             if (shape == null) return;
-            var bits = (byte[])shape.Range.EnhMetaFileBits;
+            // get the bytes of the shape
+            var bits = (byte[])range.EnhMetaFileBits;
             using (MemoryStream stream = new MemoryStream(bits))
             {
                 Bitmap bitmap = new Bitmap(stream);
-            
-                // Init image size
+                // get the actual width
                 double initW = bitmap.Height * (shape.Width / shape.Height);
                 double initH = bitmap.Height;
                 Bitmap cropBmp = Crop(bitmap, (int)initW, (int)initH);
@@ -89,6 +92,7 @@ namespace WordPictureViewer
                     bi.EndInit();
                     UIImage.Source = bi;
                 }
+                // loading animation
                 double centerX = initW / 2;
                 double centerY = initH / 2;
                 DoubleAnimation aniScale = new DoubleAnimation() { Duration = TimeSpan.FromMilliseconds(250) };
@@ -102,6 +106,7 @@ namespace WordPictureViewer
                 UIScale.BeginAnimation(ScaleTransform.CenterYProperty, aniY);
             }
         }
+        #endregion
 
         #region Private Methods
         private void PictureViewer_MouseWheel(object sender, MouseWheelEventArgs e)
