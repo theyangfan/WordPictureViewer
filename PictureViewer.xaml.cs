@@ -48,67 +48,95 @@ namespace WordPictureViewer
         #endregion
 
         #region Public Method
-        public void SetImageRange(Word.Range range)
+        public void SetSource(Word.Selection sel)
         {
-            // get original shape
-            //var shape = range.ShapeRange[1];
-            var shape = range.InlineShapes?[1];
-            if (shape == null) return;
-            // get the bytes of the shape
-            var bits = (byte[])range.EnhMetaFileBits;
-            using (MemoryStream stream = new MemoryStream(bits))
+            try
             {
-                Bitmap bitmap = new Bitmap(stream);
-                // get the actual width
-                double initW = bitmap.Height * (shape.Width / shape.Height);
-                double initH = bitmap.Height;
-                Bitmap cropBmp = Crop(bitmap, (int)initW, (int)initH);
-                double ratio = (double)initW / initH;
-                double screenW = SystemParameters.PrimaryScreenWidth;
-                double screenH = SystemParameters.PrimaryScreenHeight;
-                if (initW > screenW)
+                var type = sel.Type;
+                // get original shape
+                var shape = sel.ShapeRange?[1];
+                var left = shape.Left;
+                var top = shape.Top;
+                var width = shape.Width;
+                var height = shape.Height;
+                var lr = shape.LeftRelative;
+                var tr = shape.TopRelative;
+                var wr = shape.WidthRelative;
+                var hr = shape.HeightRelative;
+                //var shape = sel.InlineShapes?[1];
+
+                // get the bytes of the shape
+                var bits = (byte[])sel.EnhMetaFileBits;
+                using (MemoryStream stream = new MemoryStream(bits))
                 {
-                    initW = screenW;
-                    initH = initW / ratio;
+                    Bitmap bitmap = new Bitmap(stream);
+                    // get the actual width
+                    double initW = bitmap.Height * (shape.Width / shape.Height);
+                    double initH = bitmap.Height;
+                    double x = 0;
+                    if(shape.Left > 0)
+                    {
+                        x = shape.Left * bitmap.Height / shape.Height;
+                    }
+                    double y = 0;
+                    if(shape.Top > 0)
+                    {
+                        y = shape.Top * bitmap.Height / shape.Height;
+                    }
+
+                    Bitmap cropBmp = Crop(bitmap, (int)x, (int)y, (int)initW, (int)initH);
+                    double ratio = (double)initW / initH;
+                    double screenW = SystemParameters.PrimaryScreenWidth;
+                    double screenH = SystemParameters.PrimaryScreenHeight;
+                    if (initW > screenW)
+                    {
+                        initW = screenW;
+                        initH = initW / ratio;
+                    }
+                    if (initH > screenH)
+                    {
+                        initH = screenH;
+                        initW = initH * ratio;
+                    }
+                    initW *= 0.8;
+                    initH *= 0.8;
+                    UIImage.Width = initW;
+                    UIImage.Height = initH;
+
+                    // Set image source
+                    using (MemoryStream ms = new MemoryStream())
+                    {
+                        bitmap.Save(ms, ImageFormat.Bmp);
+                        byte[] bytes = ms.GetBuffer();
+                        BitmapImage bi = new BitmapImage();
+                        bi.BeginInit();
+                        bi.StreamSource = new MemoryStream(bytes);
+                        bi.EndInit();
+                        UIImage.Source = bi;
+                    }
+                    // loading animation
+                    double centerX = initW / 2;
+                    double centerY = initH / 2;
+                    DoubleAnimation aniScale = new DoubleAnimation() { Duration = TimeSpan.FromMilliseconds(250) };
+                    DoubleAnimation aniX = new DoubleAnimation(centerX, centerX, TimeSpan.FromMilliseconds(0));
+                    DoubleAnimation aniY = new DoubleAnimation(centerY, centerY, TimeSpan.FromMilliseconds(0));
+                    aniScale.From = 0;
+                    aniScale.To = 1;
+                    UIScale.BeginAnimation(ScaleTransform.ScaleXProperty, aniScale, HandoffBehavior.Compose);
+                    UIScale.BeginAnimation(ScaleTransform.ScaleYProperty, aniScale, HandoffBehavior.Compose);
+                    UIScale.BeginAnimation(ScaleTransform.CenterXProperty, aniX);
+                    UIScale.BeginAnimation(ScaleTransform.CenterYProperty, aniY);
                 }
-                if (initH > screenH)
-                {
-                    initH = screenH;
-                    initW = initH * ratio;
-                }
-                initW *= 0.8;
-                initH *= 0.8;
-                UIImage.Width = initW;
-                UIImage.Height = initH;
-                
-                // Set image source
-                using (MemoryStream ms = new MemoryStream())
-                {
-                    cropBmp.Save(ms, ImageFormat.Bmp);
-                    byte[] bytes = ms.GetBuffer();
-                    BitmapImage bi = new BitmapImage();
-                    bi.BeginInit();
-                    bi.StreamSource = new MemoryStream(bytes);
-                    bi.EndInit();
-                    UIImage.Source = bi;
-                }
-                // loading animation
-                double centerX = initW / 2;
-                double centerY = initH / 2;
-                DoubleAnimation aniScale = new DoubleAnimation() { Duration = TimeSpan.FromMilliseconds(250) };
-                DoubleAnimation aniX = new DoubleAnimation(centerX, centerX, TimeSpan.FromMilliseconds(0));
-                DoubleAnimation aniY = new DoubleAnimation(centerY, centerY, TimeSpan.FromMilliseconds(0));
-                aniScale.From = 0;
-                aniScale.To = 1;
-                UIScale.BeginAnimation(ScaleTransform.ScaleXProperty, aniScale, HandoffBehavior.Compose);
-                UIScale.BeginAnimation(ScaleTransform.ScaleYProperty, aniScale, HandoffBehavior.Compose);
-                UIScale.BeginAnimation(ScaleTransform.CenterXProperty, aniX);
-                UIScale.BeginAnimation(ScaleTransform.CenterYProperty, aniY);
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show($"{e.Message}\n{e.StackTrace}");
             }
         }
         #endregion
 
         #region Private Methods
+
         private void PictureViewer_MouseWheel(object sender, MouseWheelEventArgs e)
         {
             if(e.Delta > 0) // zoom in
@@ -140,6 +168,24 @@ namespace WordPictureViewer
             UIScaleRatio.Content = $"{_scale} %";
         }
 
+        private System.Drawing.Rectangle GetBitmapRect(Bitmap srcBmp, Word.Shape shape)
+        {
+            double height = srcBmp.Height * shape.Height / (shape.Height + Math.Abs(shape.Top));
+            double initW = srcBmp.Height * (shape.Width / shape.Height);
+            double initH = srcBmp.Height;
+            double x = 0;
+            if (shape.Left > 0)
+            {
+                x = shape.Left * srcBmp.Height / shape.Height;
+            }
+            double y = 0;
+            if (shape.Top > 0)
+            {
+                y = shape.Top * srcBmp.Height / shape.Height;
+            }
+            return System.Drawing.Rectangle.Empty;
+        }
+
         /// <summary>
         /// Crop the bitmap to the specified size.
         /// </summary>
@@ -147,9 +193,9 @@ namespace WordPictureViewer
         /// <param name="width">The specified width to crop.</param>
         /// <param name="height">The specified height to crop.</param>
         /// <returns>The new bitmap.</returns>
-        private Bitmap Crop(Bitmap srcBmp, int width, int height)
+        private Bitmap Crop(Bitmap srcBmp, int x, int y, int width, int height)
         {
-            System.Drawing.Rectangle cropRect = new System.Drawing.Rectangle(0, 0, width, height);
+            System.Drawing.Rectangle cropRect = new System.Drawing.Rectangle(x, y, width, height);
             Bitmap cropBmp = new Bitmap(width, height);
             using(Graphics g = Graphics.FromImage(cropBmp))
             {

@@ -29,16 +29,9 @@ namespace WordPictureViewer
             if(Sel.Type == Word.WdSelectionType.wdSelectionShape
                 || Sel.Type == Word.WdSelectionType.wdSelectionInlineShape)
             {
-                try
-                {
-                    PictureViewer viewer = new PictureViewer();
-                    viewer.Show();
-                    viewer.SetImageRange(Sel.Range);
-                }
-                catch (Exception e)
-                {
-                    MessageBox.Show($"{e.Message}\n{e.StackTrace}");
-                }
+                PictureViewer viewer = new PictureViewer();
+                viewer.Show();
+                viewer.SetSource(Sel);
             }
         }
 
