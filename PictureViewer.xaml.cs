@@ -48,43 +48,89 @@ namespace WordPictureViewer
         #endregion
 
         #region Public Method
-        public void SetSource(Word.Selection sel)
+        /// <summary>
+        /// Show inline shape.
+        /// </summary>
+        /// <param name="sel"></param>
+        public void ShowInlineShapeSelection(Word.Selection sel)
         {
             try
             {
-                var type = sel.Type;
-                // get original shape
-                var shape = sel.ShapeRange?[1];
-                var left = shape.Left;
-                var top = shape.Top;
-                var width = shape.Width;
-                var height = shape.Height;
-                var lr = shape.LeftRelative;
-                var tr = shape.TopRelative;
-                var wr = shape.WidthRelative;
-                var hr = shape.HeightRelative;
-                //var shape = sel.InlineShapes?[1];
-
+                var shape = sel.InlineShapes[1];
                 // get the bytes of the shape
                 var bits = (byte[])sel.EnhMetaFileBits;
                 using (MemoryStream stream = new MemoryStream(bits))
                 {
                     Bitmap bitmap = new Bitmap(stream);
-                    // get the actual width
+                    // get the available width
                     double initW = bitmap.Height * (shape.Width / shape.Height);
                     double initH = bitmap.Height;
-                    double x = 0;
-                    if(shape.Left > 0)
+                    // crop the available area
+                    Bitmap cropBmp = Crop(bitmap, 0, 0, (int)initW, (int)initH);
+                    double ratio = (double)initW / initH;
+                    double screenW = SystemParameters.PrimaryScreenWidth;
+                    double screenH = SystemParameters.PrimaryScreenHeight;
+                    if (initW > screenW)
                     {
-                        x = shape.Left * bitmap.Height / shape.Height;
+                        initW = screenW;
+                        initH = initW / ratio;
                     }
-                    double y = 0;
-                    if(shape.Top > 0)
+                    if (initH > screenH)
                     {
-                        y = shape.Top * bitmap.Height / shape.Height;
+                        initH = screenH;
+                        initW = initH * ratio;
                     }
+                    initW *= 0.8;
+                    initH *= 0.8;
+                    UIImage.Width = initW;
+                    UIImage.Height = initH;
 
-                    Bitmap cropBmp = Crop(bitmap, (int)x, (int)y, (int)initW, (int)initH);
+                    // set image source
+                    using (MemoryStream ms = new MemoryStream())
+                    {
+                        cropBmp.Save(ms, ImageFormat.Png);
+                        byte[] bytes = ms.GetBuffer();
+                        BitmapImage bi = new BitmapImage();
+                        bi.BeginInit();
+                        bi.StreamSource = new MemoryStream(bytes);
+                        bi.EndInit();
+                        UIImage.Source = bi;
+                    }
+                    // loading animation
+                    double centerX = initW / 2;
+                    double centerY = initH / 2;
+                    DoubleAnimation aniScale = new DoubleAnimation() { Duration = TimeSpan.FromMilliseconds(250) };
+                    DoubleAnimation aniX = new DoubleAnimation(centerX, centerX, TimeSpan.FromMilliseconds(0));
+                    DoubleAnimation aniY = new DoubleAnimation(centerY, centerY, TimeSpan.FromMilliseconds(0));
+                    aniScale.From = 0;
+                    aniScale.To = 1;
+                    UIScale.BeginAnimation(ScaleTransform.ScaleXProperty, aniScale, HandoffBehavior.Compose);
+                    UIScale.BeginAnimation(ScaleTransform.ScaleYProperty, aniScale, HandoffBehavior.Compose);
+                    UIScale.BeginAnimation(ScaleTransform.CenterXProperty, aniX);
+                    UIScale.BeginAnimation(ScaleTransform.CenterYProperty, aniY);
+                }
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show($"{e.Message}\n{e.StackTrace}");
+            }
+        }
+
+        /// <summary>
+        /// Show floating shape.
+        /// </summary>
+        /// <param name="sel"></param>
+        public void ShowFloatingShapeSelection(Word.Selection sel)
+        {
+            try
+            {
+                // get the bytes of the shape
+                var bits = (byte[])sel.EnhMetaFileBits;
+                using (MemoryStream stream = new MemoryStream(bits))
+                {
+                    Bitmap bitmap = new Bitmap(stream);
+                    double initW = bitmap.Width;
+                    double initH = bitmap.Height;
                     double ratio = (double)initW / initH;
                     double screenW = SystemParameters.PrimaryScreenWidth;
                     double screenH = SystemParameters.PrimaryScreenHeight;
@@ -106,7 +152,7 @@ namespace WordPictureViewer
                     // Set image source
                     using (MemoryStream ms = new MemoryStream())
                     {
-                        bitmap.Save(ms, ImageFormat.Bmp);
+                        bitmap.Save(ms, ImageFormat.Png);
                         byte[] bytes = ms.GetBuffer();
                         BitmapImage bi = new BitmapImage();
                         bi.BeginInit();

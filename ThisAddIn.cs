@@ -25,13 +25,19 @@ namespace WordPictureViewer
         {
             Ribbon ribbon = Globals.Ribbons.GetRibbon<Ribbon>();
             if (!ribbon.IsEnable) return;
-            // Filter shapes
-            if(Sel.Type == Word.WdSelectionType.wdSelectionShape
-                || Sel.Type == Word.WdSelectionType.wdSelectionInlineShape)
+            // inline shapes
+            if(Sel.Type == Word.WdSelectionType.wdSelectionInlineShape)
             {
                 PictureViewer viewer = new PictureViewer();
                 viewer.Show();
-                viewer.SetSource(Sel);
+                viewer.ShowInlineShapeSelection(Sel);
+            }
+            // floating shapes
+            else if(Sel.Type == Word.WdSelectionType.wdSelectionShape)
+            {
+                PictureViewer viewer = new PictureViewer();
+                viewer.Show();
+                viewer.ShowFloatingShapeSelection(Sel);
             }
         }
 
