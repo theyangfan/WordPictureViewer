@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:WordPictureViewer"
              mc:Ignorable="d" 
-             Title="图片预览" d:DesignHeight="450" d:DesignWidth="800" Background="#CC000000">
+             Title="图片预览" d:DesignHeight="450" d:DesignWidth="800" Background="#CC000000" KeyDown="Window_KeyDown">
     <Window.Resources>
         <Style x:Key="ImageBtnStyle1" TargetType="{x:Type Button}">
             <Setter Property="Background" Value="Transparent"/>
