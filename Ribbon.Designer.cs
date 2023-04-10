@@ -13,12 +13,12 @@
             InitializeComponent();
             if (System.Globalization.CultureInfo.CurrentCulture.NativeName.StartsWith("中文"))
             {
-                tab1.Label = "图片预览";
+                tab1.Label = "图片浏览器";
                 UIEnable.Label = "启用";
             }
             else
             {
-                tab1.Label = "PicViewer";
+                tab1.Label = "PictureViewer";
                 UIEnable.Label = "Enable";
             }
         }
@@ -55,7 +55,7 @@
             // 
             this.tab1.ControlId.ControlIdType = Microsoft.Office.Tools.Ribbon.RibbonControlIdType.Office;
             this.tab1.Groups.Add(this.group1);
-            this.tab1.Label = "图片预览";
+            this.tab1.Label = "图片浏览器";
             this.tab1.Name = "tab1";
             this.tab1.Tag = "";
             // 
