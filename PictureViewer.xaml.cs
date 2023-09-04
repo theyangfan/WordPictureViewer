@@ -28,8 +28,10 @@ namespace WordPictureViewer
     public partial class PictureViewer : Window
     {
         #region Private Members
+        private const int MINIMUM_SCALE = 50;
         private int _scale = 100;
-        private int _scaleStep = 9;
+        private int _scaleStep = 10;
+        private bool _zoomIn = true;
         #endregion
 
         #region Constructor
@@ -187,18 +189,19 @@ namespace WordPictureViewer
         {
             if(e.Delta > 0) // zoom in
             {
-                if(_scaleStep < 0)_scaleStep = -_scaleStep;
-                else _scaleStep++;
+                if(_zoomIn && _scale > 100) _scaleStep++;
+                _scale += _scaleStep;
+                _zoomIn = true;
             }
             else // zoom out
             {
-                if (_scaleStep > 0) _scaleStep = -_scaleStep;
-                else if(_scale + _scaleStep >= 99) _scaleStep++;
+                if (!_zoomIn && _scale > 100) _scaleStep--;
+                if (_scale - _scaleStep < MINIMUM_SCALE) return;
+                _scale -= _scaleStep;
+                _zoomIn = false;
             }
-            if (_scale + _scaleStep < 100) return;
             // smooth scale animation
             DoubleAnimation aniScale = new DoubleAnimation() { Duration = TimeSpan.FromMilliseconds(250) };
-            _scale += _scaleStep;
             aniScale.To = (double)_scale / 100;
             System.Windows.Point mouse = Mouse.GetPosition(UIImage);
             double centerX = mouse.X;
