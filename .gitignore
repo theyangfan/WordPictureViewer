@@ -1,5 +1,5 @@
 .vs/*
-bin/*
-obj/*
+src/bin/*
+src/obj/*
 publish/*
-*.user
+src/*.user

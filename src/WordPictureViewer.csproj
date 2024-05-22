@@ -189,6 +189,12 @@
     <Compile Include="PictureViewer.xaml.cs">
       <DependentUpon>PictureViewer.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Resources\Strings.zh-CN.Designer.cs">
+      <DependentUpon>Strings.zh-CN.resx</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Include="Utils\ResourceHelper.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -198,6 +204,14 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="Resources\Strings.zh-CN.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Strings.zh-CN.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Strings.en-US.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Strings.en-US.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
     <EmbeddedResource Include="Ribbon.resx">
       <DependentUpon>Ribbon.cs</DependentUpon>
     </EmbeddedResource>
@@ -208,6 +222,11 @@
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
+    <Compile Include="Resources\Strings.en-US.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Strings.en-US.resx</DependentUpon>
     </Compile>
     <Compile Include="Ribbon.cs">
       <SubType>Component</SubType>
@@ -234,10 +253,26 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="close.png" />
+    <Resource Include="Resources\Images\close.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="close_red.png" />
+    <Resource Include="Resources\Images\save.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Images\zoom_in.png" />
+    <Resource Include="Resources\Images\zoom_out.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Images\logo.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Images\zoom_out_disabled.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Images\share.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Images\center.png" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

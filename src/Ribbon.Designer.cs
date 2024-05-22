@@ -11,16 +11,8 @@
             : base(Globals.Factory.GetRibbonFactory())
         {
             InitializeComponent();
-            if (System.Globalization.CultureInfo.CurrentCulture.NativeName.StartsWith("中文"))
-            {
-                tab1.Label = "图片浏览器";
-                UIEnable.Label = "启用";
-            }
-            else
-            {
-                tab1.Label = "PictureViewer";
-                UIEnable.Label = "Enable";
-            }
+            tab1.Label = ResourceHelper.Current.GetString("AppName");
+            UIEnable.Label = ResourceHelper.Current.GetString("Enable");
         }
 
         /// <summary> 
