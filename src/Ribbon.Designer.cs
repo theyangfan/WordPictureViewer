@@ -11,8 +11,7 @@
             : base(Globals.Factory.GetRibbonFactory())
         {
             InitializeComponent();
-            tab1.Label = ResourceHelper.Current.GetString("AppName");
-            UIEnable.Label = ResourceHelper.Current.GetString("Enable");
+            tab1.Label = ResourceHelper.Strings.GetString("AppName");
         }
 
         /// <summary> 
@@ -38,7 +37,8 @@
         {
             this.tab1 = this.Factory.CreateRibbonTab();
             this.group1 = this.Factory.CreateRibbonGroup();
-            this.UIEnable = this.Factory.CreateRibbonCheckBox();
+            this.uiEnable = this.Factory.CreateRibbonCheckBox();
+            this.uiVersion = this.Factory.CreateRibbonLabel();
             this.tab1.SuspendLayout();
             this.group1.SuspendLayout();
             this.SuspendLayout();
@@ -47,21 +47,26 @@
             // 
             this.tab1.ControlId.ControlIdType = Microsoft.Office.Tools.Ribbon.RibbonControlIdType.Office;
             this.tab1.Groups.Add(this.group1);
-            this.tab1.Label = "图片浏览器";
+            this.tab1.Label = "WordPictureViewer";
             this.tab1.Name = "tab1";
             this.tab1.Tag = "";
             // 
             // group1
             // 
-            this.group1.Items.Add(this.UIEnable);
-            this.group1.Label = "选项";
+            this.group1.Items.Add(this.uiEnable);
+            this.group1.Items.Add(this.uiVersion);
             this.group1.Name = "group1";
             // 
-            // UIEnable
+            // uiEnable
             // 
-            this.UIEnable.Checked = true;
-            this.UIEnable.Label = "启用";
-            this.UIEnable.Name = "UIEnable";
+            this.uiEnable.Checked = true;
+            this.uiEnable.Label = "启用";
+            this.uiEnable.Name = "uiEnable";
+            // 
+            // uiVersion
+            // 
+            this.uiVersion.Label = " ";
+            this.uiVersion.Name = "uiVersion";
             // 
             // Ribbon
             // 
@@ -79,8 +84,9 @@
 
         #endregion
         internal Microsoft.Office.Tools.Ribbon.RibbonGroup group1;
-        internal Microsoft.Office.Tools.Ribbon.RibbonCheckBox UIEnable;
+        internal Microsoft.Office.Tools.Ribbon.RibbonCheckBox uiEnable;
         internal Microsoft.Office.Tools.Ribbon.RibbonTab tab1;
+        internal Microsoft.Office.Tools.Ribbon.RibbonLabel uiVersion;
     }
 
     partial class ThisRibbonCollection

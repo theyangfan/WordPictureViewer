@@ -11,6 +11,7 @@ using System.Windows;
 using System.Drawing;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Globalization;
 
 namespace WordPictureViewer
 {

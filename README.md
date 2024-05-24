@@ -4,13 +4,17 @@
 
 This project is a Word VSTO add-in program (plug-in) for **double-click to enlarge** browse pictures in Office Word documents.
 
-![Example](https://github.com/theyangfan/WordPictureViewer/blob/main/example.gif)
+![Example](images/example_01.png)
+
+![Example02](images/example_02.png)
+
+
 
 ## 下载 (Downloads)
 
-| Office AddIn | Download                                                                                                   |
-| ------------ | ---------------------------------------------------------------------------------------------------------- |
-| Word         | [word_v1.0.3.zip](https://github.com/theyangfan/WordPictureViewer/releases/download/1.0.3/word_v1.0.3.zip) |
+| Office AddIn | Download                                                                                                              |
+| ------------ | --------------------------------------------------------------------------------------------------------------------- |
+| Word         | [word_v1.1.0.zip (20240524)](https://github.com/theyangfan/WordPictureViewer/releases/download/1.1.0/word_v1.1.0.zip) |
 
 ## 安装 (Install)
 
@@ -25,6 +29,11 @@ Unzip the package, double-click setup.exe, click Install, and finish.
 Open Windows Settings, go to 【Apps】 - 【Apps and Features】, search for WordPictureViewer, click Uninstall, and done.
 
 ## 更新日志 (Release History)
+
+### v1.1.0 (2024-05-24)
+
+- 更新浏览界面；
+- 新增图片保存和使用本机默认照片程序打开功能。
 
 ### v1.0.3 (2023-09-04)
 

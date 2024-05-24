@@ -29,18 +29,16 @@ namespace WordPictureViewer
     public partial class PictureViewer : Window
     {
         #region Private Members
-        private const int MINIMUM_SCALE = 50;
+        private const int MINIMUM_SCALE = 50; // 50%
         private Bitmap _bitmap = null;
-        private double _screenW;
-        private double _screenH;
         private double _oriWidth;
         private double _oriHeight;
-        private int _scale = 100;
+        private int _scale = 100; // 100%
         private int _scaleStep = 10;
-        private bool _zoomIn = true;
+        private bool _isZoomIn = true;
 
-        private bool _isPressed = false;
         private System.Windows.Point _pressedPoint;
+        private bool _isPressed = false;
         private double _lastXOffset = 0;
         private double _lastYOffset = 0;
         #endregion
@@ -58,7 +56,7 @@ namespace WordPictureViewer
 
             InitUI();
 
-            // Mouse wheel event
+            // Mouse events
             MouseWheel += PictureViewer_MouseWheel;
 
             uiContent.MouseDown += PictureViewer_MouseDown;
@@ -95,16 +93,16 @@ namespace WordPictureViewer
                     _bitmap = Crop(srcBmp, 0, 0, (int)_oriWidth, (int)_oriHeight);
                     lblPicSize.Content = $"{_bitmap.Width} x {_bitmap.Height}";
                     double ratio = (double)_oriWidth / _oriHeight;
-                    _screenW = SystemParameters.PrimaryScreenWidth;
-                    _screenH = SystemParameters.PrimaryScreenHeight;
-                    if (_oriWidth > _screenW)
+                    double screenW = SystemParameters.PrimaryScreenWidth;
+                    double screenH = SystemParameters.PrimaryScreenHeight;
+                    if (_oriWidth > screenW)
                     {
-                        _oriWidth = _screenW;
+                        _oriWidth = screenW;
                         _oriHeight = _oriWidth / ratio;
                     }
-                    if (_oriHeight > _screenH)
+                    if (_oriHeight > screenH)
                     {
-                        _oriHeight = _screenH;
+                        _oriHeight = screenH;
                         _oriWidth = _oriHeight * ratio;
                     }
                     _oriWidth *= 0.8;
@@ -192,20 +190,23 @@ namespace WordPictureViewer
         #region Private Methods
         private void InitUI()
         {
-            uiLogo.ToolTip = ResourceHelper.Current.GetString("AppName");
-            uiBtnSave.ToolTip = ResourceHelper.Current.GetString("SaveAs");
-            uiBtnOpenWith.ToolTip = ResourceHelper.Current.GetString("OpenWith");
-            uiBtnZoomIn.ToolTip = ResourceHelper.Current.GetString("ZoomIn");
-            uiBtnZoomOut.ToolTip = ResourceHelper.Current.GetString("ZoomOut");
-            uiBtnCentered.ToolTip = ResourceHelper.Current.GetString("AlignCenter");
+            // set button tooltip
+            uiLogo.ToolTip = ResourceHelper.Strings.GetString("AppName");
+            uiBtnSave.ToolTip = ResourceHelper.Strings.GetString("SaveAs");
+            uiBtnOpenWith.ToolTip = ResourceHelper.Strings.GetString("OpenWith");
+            uiBtnZoomIn.ToolTip = ResourceHelper.Strings.GetString("ZoomIn");
+            uiBtnZoomOut.ToolTip = ResourceHelper.Strings.GetString("ZoomOut");
+            uiBtnCentered.ToolTip = ResourceHelper.Strings.GetString("AlignCenter");
         }
 
         private void ZoomIn()
         {
             double scale = (double)_scale / 100;
-            if (_zoomIn && _scale > 100) _scaleStep++;
+            // scale step increase when zoom in
+            if (_isZoomIn && _scale > 100) _scaleStep++;
+
             _scale += _scaleStep;
-            _zoomIn = true;
+            _isZoomIn = true;
             double newScale = (double)_scale / 100;
 
             Scale(scale, newScale, _oriWidth / 2, _oriHeight / 2);
@@ -219,10 +220,12 @@ namespace WordPictureViewer
         private void ZoomOut()
         {
             double scale = (double)_scale / 100;
-            if (!_zoomIn && _scale > 100) _scaleStep--;
+            // scale step decrease when zoom out
+            if (!_isZoomIn && _scale > 100) _scaleStep--;
+
             if (_scale - _scaleStep < MINIMUM_SCALE) return;
             _scale -= _scaleStep;
-            _zoomIn = false;
+            _isZoomIn = false;
             double newScale = (double)_scale / 100;
 
             Scale(scale, newScale, _oriWidth / 2, _oriHeight / 2);
@@ -350,33 +353,49 @@ namespace WordPictureViewer
             uiTranslate.X = _lastXOffset + offset.X;
             uiTranslate.Y = _lastYOffset + offset.Y;
         }
+
         private void btnSave_Click(object sender, RoutedEventArgs e)
         {
-            if(_bitmap  == null)
+            try
             {
-                MessageBox.Show("Invalid Picture!");
-                return;
-            }
-            Microsoft.Win32.SaveFileDialog save = new Microsoft.Win32.SaveFileDialog();
-            save.Filter = "Jpeg Files (*.jpg, *.jpeg)|*.jpg;*.jpeg | Png files (*.png) |*.png | Bmp Files (*.bmp)|*.bmp " +
-                "| Gif Files (*.gif)|*.gif | Emf Files (*.emf)|*.emf | All Files (*.*)|*.*";
-            if (save.ShowDialog() != true) return;
-            string ext = new FileInfo(save.FileName).Extension;
-            ImageFormat format = GetImageFormat(ext);
+                if (_bitmap == null)
+                {
+                    MessageBox.Show("Invalid Picture!");
+                    return;
+                }
+                Microsoft.Win32.SaveFileDialog save = new Microsoft.Win32.SaveFileDialog();
+                save.Filter = "Jpeg Files (*.jpg, *.jpeg)|*.jpg;*.jpeg | Png files (*.png) |*.png | Bmp Files (*.bmp)|*.bmp " +
+                    "| Gif Files (*.gif)|*.gif | Emf Files (*.emf)|*.emf | All Files (*.*)|*.*";
+                if (save.ShowDialog() != true) return;
+                string ext = new FileInfo(save.FileName).Extension;
+                ImageFormat format = GetImageFormat(ext);
 
-            _bitmap.Save(save.FileName, format);
+                _bitmap.Save(save.FileName, format);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
         }
 
         private void btnOpenWith_Click(object sender, RoutedEventArgs e)
         {
-            if (_bitmap == null)
+            try
             {
-                MessageBox.Show("Invalid Picture!");
-                return;
+                if (_bitmap == null)
+                {
+                    MessageBox.Show("Invalid Picture!");
+                    return;
+                }
+                string tempFile = System.IO.Path.Combine(System.IO.Path.GetTempPath(), $"WordPictureViewer-{Guid.NewGuid()}.jpg");
+                _bitmap.Save(tempFile, ImageFormat.Jpeg);
+                System.Diagnostics.Process.Start(tempFile);
             }
-            string tempFile = System.IO.Path.Combine(System.IO.Path.GetTempPath(), $"WordPictureViewer-{Guid.NewGuid()}.jpg");
-            _bitmap.Save(tempFile, ImageFormat.Jpeg);
-            System.Diagnostics.Process.Start(tempFile);
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            
         }
 
         private void btnClose_Click(object sender, RoutedEventArgs e)
@@ -397,6 +416,7 @@ namespace WordPictureViewer
 
         private void btnCentered_Click(object sender, RoutedEventArgs e)
         {
+            // reset translate offset
             uiTranslate.X = 0;
             uiTranslate.Y = 0;
             _lastXOffset = 0;
@@ -407,6 +427,7 @@ namespace WordPictureViewer
         {
             if(e.Key == Key.Escape) 
             {
+                if (_bitmap != null) _bitmap.Dispose();
                 Close();
             }
         }

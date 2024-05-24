@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Resources;
 using System.Text;
@@ -11,11 +12,14 @@ namespace WordPictureViewer
     {
         private static ResourceManager _resourceManager;
 
-        public static ResourceManager Current
+        /// <summary>
+        /// The localizable strings resource.
+        /// </summary>
+        public static ResourceManager Strings
         {
             get
             {
-                if(_resourceManager == null)
+                if (_resourceManager == null)
                 {
                     _resourceManager = new ResourceManager("WordPictureViewer.Resources.Strings", typeof(ResourceHelper).Assembly);
                 }
